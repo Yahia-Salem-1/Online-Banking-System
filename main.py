@@ -16,7 +16,7 @@ def sign_user_choice():
             log_in()
         elif user_choice == 2:
             sign_up()
-        elif user_choice == 3:
+        elif user_choice == -1:
             exit_program()
         else:
             print("\nPlease enter a valid number.\n")
@@ -24,8 +24,10 @@ def sign_user_choice():
     except ValueError:
         print("\nPlease put in only numbers and do not enter empty spaces.")
         return sign_user_choice()
-    
 
+def exit_program():
+    global isUsed
+    isUsed = False
 
 while isUsed:
     sign_user_choice()
