@@ -105,6 +105,7 @@ def sign_user_up(first, last, user, passwd, e_mail, pin):
     cursor.execute(insert_required_info)
 
 def log_user_in(user_n, passw):
+    global cursor
     cursor.execute(select_bank_account)
 
     select_username = ("""SELECT username FROM bank_account""")
@@ -123,14 +124,14 @@ def log_user_in(user_n, passw):
                 for x in cursor:
                     if x == passw:
                         bank_account()
-                if cursor[-1] != passw:
+                if cursor != passw:
                     print("\nIncorrect password!")
                     log_in()
         
         
         cursor.execute(select_username) 
 
-        if item in cursor[-1] != user_n:
+        if item not in cursor:
             print("\nThere are no users with this name!")
             log_in()
     
