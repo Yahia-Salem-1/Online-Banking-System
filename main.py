@@ -122,7 +122,7 @@ def log_user_in(user_n, passw):
                 cursor.execute(select_password)
                 for x in cursor:
                     if x == passw:
-                        main.bank_account()
+                        bank_account()
                 if cursor[-1] != passw:
                     print("\nIncorrect password!")
                     log_in()
@@ -136,8 +136,8 @@ def log_user_in(user_n, passw):
     
 def test_query():
     cursor.execute(select_first_name)
-    for item in cursor:
-        print(item)
+    for a in cursor:
+        print(a)
 
 
 while isUsed:
