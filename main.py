@@ -1,10 +1,9 @@
 from time import sleep
-import random
 import mysql.connector as connector
 
 
 isUsed = True
-connection = connector.connect(host = 'localhost', user = 'root', password = "Seafood@1431", database = "bank")
+connection = connector.connect(user = 'root', password = "Seafood@1431", database = "bank")
 
 cursor = connection.cursor()
 cursor = connection.cursor(buffered=True)
@@ -86,34 +85,11 @@ def log_in():
     password = str(input("\nEnter password: "))
     
     log_user_in(username, password)
-
-def bank_account():
-    select_name = ("""SELECT First_Name, Last_Name FROM bank_account""")
     
-    select_name.fetchone()
-    item = cursor.execute(select_name)
-    user_selection = {
-        "1." : "Withdraw Money",
-        "2." : "Deposit Money",
-        "3." : "Check Balance",
-        "4." : "Log out",
-        "5." : "Exit program"
-    }
-
-    print("\n\nWelcome, {0} {1}".format(item[0], item[1]))
-
-    for key, value in user_selection.items():
-        print("{0}\t{1}".format(key, value))
-
-def withdraw():
-    pass
-
-def deposit():
-    pass
-
 def exit_program():
     global isUsed
     isUsed = False
+
 def sign_user_up(first, last, user, passwd, e_mail, pin):
     cursor.execute(select_bank_account)
     insert_required_info = ("""INSERT INTO bank_account(username, password, First_Name, Last_Name, Pin, email) VALUES(%s, %s, %s, %s, %s, %s)""", (user, passwd, first, last, pin, e_mail))
@@ -125,9 +101,9 @@ def sign_user_up(first, last, user, passwd, e_mail, pin):
 def log_user_in(user_n, passw):
     cursor.execute(select_bank_account)
 
-    select_user_pass = ("""SELECT username, password FROM bank_account""")
+    select_user_pass_name = ("""SELECT username, password, First_Name, Last_Name, money FROM bank_account""")
 
-    cursor.execute(select_user_pass)
+    cursor.execute(select_user_pass_name)
 
     found_user = False
 
@@ -149,6 +125,55 @@ def log_user_in(user_n, passw):
             print("\nThere are no users with this name!")
             sign_user_choice()
     
+    def bank_account():
+        user_selection = {
+            "1." : "Withdraw Money",
+            "2." : "Deposit Money",
+            "3." : "Check Balance",
+            "4." : "Log out",
+            "5." : "Exit program"
+        }
+
+        print("\n\nWelcome, {0} {1}".format(i[2], i[3]))
+
+        for key, value in user_selection.items():
+            print("\n{0}\t{1}".format(key, value))
+        
+        try:
+            bank_user_choice = int(input("\nSelect a number (1-5): "))
+
+        except ValueError:
+            print("\nPlease enter an integer")
+            bank_account()
+
+        if bank_user_choice == 1:
+            withdraw()
+        
+        elif bank_user_choice == 2:
+            deposit()
+        
+        elif bank_user_choice == 3:
+            check_balance()
+
+        elif bank_user_choice == 4:
+            sign_user_choice()
+        
+        elif bank_user_choice == 5:
+            exit_program()
+
+        else:
+            print("\nPlease enter a number from 1 to 5")
+            bank_account()
+
+        def withdraw():
+            pass
+
+        def deposit():
+            pass
+
+        def check_balance():
+            pass
+        
 def test_query():
     cursor.execute(select_first_name)
     for a in cursor:
