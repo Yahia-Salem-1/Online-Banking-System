@@ -88,7 +88,7 @@ def log_in():
     log_user_in(username, password)
 
 def bank_account():
-    pass 
+    print("Perfect") 
 
 def withdraw():
     pass
@@ -101,39 +101,38 @@ def exit_program():
     isUsed = False
 def sign_user_up(first, last, user, passwd, e_mail, pin):
     cursor.execute(select_bank_account)
-    insert_required_info = ("""INSERT INTO bank_account(username, password, First_Name, Last_Name, Pin, email) VALUES("{0}", "{1}", "{2}", "{3}", "{4}", "{5}")""".format(user, passwd, first, last, pin, e_mail))
+    insert_required_info = ("""INSERT INTO bank_account(username, password, First_Name, Last_Name, Pin, email) VALUES(%s, %s, %s, %s, %s, %s)""", (user, passwd, first, last, pin, e_mail))
+    
+
     cursor.execute(insert_required_info)
+    connection.commit()
 
 def log_user_in(user_n, passw):
-    global cursor
     cursor.execute(select_bank_account)
 
-    select_username = ("""SELECT username FROM bank_account""")
-    select_password = ("""SELECT password FROM bank_account""")
-    
-    cursor.execute(select_username)
+    select_user_pass = ("""SELECT username, password FROM bank_account""")
 
-    if cursor == None:
+    cursor.execute(select_user_pass)
+
+    found_user = False
+
+    if not cursor.fetchone() == None: #shorter than 'if cursor == None:' and makes more sense in code
         print("\nThere are no users! Please sign up.")
         sign_up()
-
+    
     else:
-        for item in cursor:
-            if item == user_n:
-                cursor.execute(select_password)
-                for x in cursor:
-                    if x == passw:
-                        bank_account()
-                if cursor != passw:
+        for i in cursor.fetchall():
+            if i[0] == user_n:
+                found_user = True
+                if i[1] == passw:
+                    bank_account()
+                else:
                     print("\nIncorrect password!")
                     log_in()
-        
-        
-        cursor.execute(select_username) 
-
-        if item not in cursor:
+            
+        if not found_user:
             print("\nThere are no users with this name!")
-            log_in()
+            sign_user_choice()
     
 def test_query():
     cursor.execute(select_first_name)
@@ -142,5 +141,7 @@ def test_query():
 
 
 while isUsed:
+    connection.ping(reconnect=True)
     sign_user_choice()
+    
 
