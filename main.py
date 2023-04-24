@@ -88,7 +88,22 @@ def log_in():
     log_user_in(username, password)
 
 def bank_account():
-    print("Perfect") 
+    select_name = ("""SELECT First_Name, Last_Name FROM bank_account""")
+    
+    select_name.fetchone()
+    item = cursor.execute(select_name)
+    user_selection = {
+        "1." : "Withdraw Money",
+        "2." : "Deposit Money",
+        "3." : "Check Balance",
+        "4." : "Log out",
+        "5." : "Exit program"
+    }
+
+    print("\n\nWelcome, {0} {1}".format(item[0], item[1]))
+
+    for key, value in user_selection.items():
+        print("{0}\t{1}".format(key, value))
 
 def withdraw():
     pass
