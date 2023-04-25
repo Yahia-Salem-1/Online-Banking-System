@@ -1,5 +1,6 @@
 from time import sleep
 import mysql.connector as connector
+import random
 
 
 isUsed = True
@@ -107,7 +108,7 @@ def log_user_in(user_n, passw):
 
     found_user = False
 
-    if not cursor.fetchone() == None: #shorter than 'if cursor == None:' and makes more sense in code
+    if not cursor.fetchone(): #shorter than 'if cursor == None:' and makes more sense in code
         print("\nThere are no users! Please sign up.")
         sign_up()
     
@@ -130,6 +131,7 @@ def log_user_in(user_n, passw):
             "1." : "Withdraw Money",
             "2." : "Deposit Money",
             "3." : "Check Balance",
+            "6." : "ATM Locator",
             "4." : "Log out",
             "5." : "Exit program"
         }
@@ -166,13 +168,37 @@ def log_user_in(user_n, passw):
             bank_account()
 
         def withdraw():
-            pass
+            try:
+                qnty = int(input("\nHow much do you want to withdraw? "))
+            except ValueError:
+                print("\nPlease enter a whole number!")
+
+            money = i[4]
+
+            if money - qnty < 0:
+                print("\nYou do not have enough money")
+                withdraw()
+            elif qnty < 0:
+                print("\nYou can deposit instead of withdrawing negative money.")
+                deposit()
 
         def deposit():
             pass
 
         def check_balance():
-            pass
+            print("\n{0} account balance: ${1}".format(i[0], i[4]))
+            print("\n'1' to go back to your main dashboard")
+            
+            try:
+                back = int(input(""))
+            except ValueError:
+                check_balance()
+
+            if back == 1:
+                bank_account()
+            else: 
+                check_balance()
+
         
 def test_query():
     cursor.execute(select_first_name)
