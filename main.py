@@ -4,13 +4,12 @@ import random
 
 
 isUsed = True
-connection = connector.connect(user = 'root', password = "Seafood@1431", database = "bank")
-
-cursor = connection.cursor()
-cursor = connection.cursor(buffered=True)
-
-select_bank_account = ("""SELECT * FROM bank_account""")
-select_first_name = ("""SELECT username FROM bank_account""")
+def connect():
+    global connection, cursor, select_bank_account
+    
+    connection = connector.connect(user = 'root', password = "root", database = "bank")
+    cursor = connection.cursor()
+    select_bank_account = ("""SELECT * FROM bank_account""")
 
 print("\n\t\tYahia's Online Banking System:\n\n")
 
@@ -32,7 +31,7 @@ def sign_user_choice():
 
     except ValueError:
         print("\nPlease put in only numbers and do not enter empty spaces.")
-        return sign_user_choice()
+        sign_user_choice()
 
     
 
@@ -80,6 +79,7 @@ def sign_up():
 
     else:
         sign_user_up(f_name, l_name, username, password, email, pin)
+        sign_user_choice()
     
 def log_in():
     username = str(input("\nEnter username: "))
@@ -88,8 +88,11 @@ def log_in():
     log_user_in(username, password)
     
 def exit_program():
+    print("\nThank you for using our app!")
     global isUsed
     isUsed = False
+    cursor.close()
+    connection.close()
 
 def sign_user_up(first, last, user, passwd, e_mail, pin):
     cursor.execute(select_bank_account)
@@ -98,22 +101,25 @@ def sign_user_up(first, last, user, passwd, e_mail, pin):
 
     cursor.execute(insert_required_info)
     connection.commit()
+    
+
 
 def log_user_in(user_n, passw):
+    cursor = connection.cursor(buffered=True)
     cursor.execute(select_bank_account)
-
+    
     select_user_pass_name = ("""SELECT username, password, First_Name, Last_Name, money FROM bank_account""")
 
     cursor.execute(select_user_pass_name)
-
+ 
     found_user = False
 
-    if not cursor.fetchone(): #shorter than 'if cursor == None:' and makes more sense in code
+    if not cursor.fetchall(): #shorter than 'if cursor == None:' and makes more sense in code
         print("\nThere are no users! Please sign up.")
         sign_up()
     
     else:
-        for i in cursor.fetchall():
+        for i in cursor.fetchone():
             if i[0] == user_n:
                 found_user = True
                 if i[1] == passw:
@@ -125,15 +131,16 @@ def log_user_in(user_n, passw):
         if not found_user:
             print("\nThere are no users with this name!")
             sign_user_choice()
-    
+
+
     def bank_account():
         user_selection = {
             "1." : "Withdraw Money",
             "2." : "Deposit Money",
             "3." : "Check Balance",
-            "6." : "ATM Locator",
-            "4." : "Log out",
-            "5." : "Exit program"
+            "4." : "ATM Locator",
+            "5." : "Log out",
+            "6." : "Exit program"
         }
 
         print("\n\nWelcome, {0} {1}".format(i[2], i[3]))
@@ -158,9 +165,12 @@ def log_user_in(user_n, passw):
             check_balance()
 
         elif bank_user_choice == 4:
+            nearest_ATM()
+
+        elif bank_user_choice == 5:
             sign_user_choice()
         
-        elif bank_user_choice == 5:
+        elif bank_user_choice == 6:
             exit_program()
 
         else:
@@ -169,11 +179,11 @@ def log_user_in(user_n, passw):
 
         def withdraw():
             try:
-                qnty = int(input("\nHow much do you want to withdraw? "))
+                qnty = round(float(input("\nHow much do you want to withdraw? ")), 2)
             except ValueError:
-                print("\nPlease enter a whole number!")
+                print("\nPlease enter a number!")
 
-            money = i[4]
+            money = float(i[4])
 
             if money - qnty < 0:
                 print("\nYou do not have enough money")
@@ -181,9 +191,30 @@ def log_user_in(user_n, passw):
             elif qnty < 0:
                 print("\nYou can deposit instead of withdrawing negative money.")
                 deposit()
+            else:
+                money = float(money - qnty)
+
+                i[4] = money
+
+
+                
 
         def deposit():
-            pass
+            try:
+                qnty = round(float(input("\nHow much do you want to deposit? ")), 2)
+            except ValueError:
+                print("\nPlease enter a number!")
+
+            money = float(i[4])
+
+            if qnty < 0:
+                print("\nYou can withdraw instead of depositing negative money.")
+                withdraw()
+            else:
+                money = float(money + qnty)
+
+                i[4] = money
+
 
         def check_balance():
             print("\n{0} account balance: ${1}".format(i[0], i[4]))
@@ -199,15 +230,93 @@ def log_user_in(user_n, passw):
             else: 
                 check_balance()
 
-        
-def test_query():
-    cursor.execute(select_first_name)
-    for a in cursor:
-        print(a)
+def nearest_ATM():
+    number = str(random.randint(100, 99999))
+    names = (['advice', 'disease', 'city', 'leader', 'reading', 'refrigerator', 'education', 'equipment', 'apple', 'tradition', 'professor', 'indication', 'nature', 'environment', 'consequence', 'editor', 'ratio', 'software', 'inflation', 'dad', 'village', 'hat', 'uncle', 'assistance', 'hotel', 'shirt', 'variation', 'location', 'winner', 'understanding', 'assistant', 'committee', 'music', 'trainer', 'control', 'news', 'ladder', 'entry', 'recognition', 'difficulty', 'agency', 'efficiency', 'football', 'son', 'cousin', 'engineering', 'pollution', 'health', 'situation', 'chocolate'])
+    road_types = ['Fwy', 'Hwy', 'Blvd', 'St', 'Rd', 'Ave', 'Ln', 'Dr', 'Pkwy', 'Trl', 'Cir', 'Ct', 'Pl', 'Ter', 'Expy', 'Way', 'Pk', 'Sq', 'Plz', 'Cove', 'Ally', 'Cres', 'Cswy', 'Pass', 'Bay', 'Gate', 'Grn', 'Hts', 'Knl', 'Mtwy']
+    random_names = random.choice(names).capitalize()
+    random_types = random.choice(road_types)
 
+    cities_dict = {
+        "Pittsburgh": "Pennsylvania",
+        "Detroit": "Michigan",
+        "Cleveland": "Ohio",
+        "Gary": "Indiana",
+        "Youngstown": "Ohio",
+        "Milwaukee": "Wisconsin",
+        "Baltimore": "Maryland",
+        "St. Louis": "Missouri",
+        "Cincinnati": "Ohio",
+        "Chicago": "Illinois",
+        "Philadelphia": "Pennsylvania",
+        "Buffalo": "New York",
+        "Newark": "New Jersey",
+        "Kansas City": "Missouri",
+        "Louisville": "Kentucky",
+        "Birmingham": "Alabama",
+        "Memphis": "Tennessee",
+        "New Orleans": "Louisiana",
+        "Atlanta": "Georgia",
+        "Houston": "Texas",
+        "Dallas": "Texas",
+        "San Antonio": "Texas",
+        "Fort Worth": "Texas",
+        "Austin": "Texas",
+        "El Paso": "Texas",
+        "Tulsa": "Oklahoma",
+        "Oklahoma City": "Oklahoma",
+        "Wichita": "Kansas",
+        "Omaha": "Nebraska",
+        "Des Moines": "Iowa",
+        "Minneapolis": "Minnesota",
+        "Duluth": "Minnesota",
+        "Grand Rapids": "Michigan",
+        "Saginaw": "Michigan",
+        "Flint": "Michigan",
+        "Buffalo": "West Virginia",
+        "Scranton": "Pennsylvania",
+        "Hartford": "Connecticut",
+        "New Haven": "Connecticut",
+        "Providence": "Rhode Island",
+        "Worcester": "Massachusetts",
+        "Springfield": "Massachusetts",
+        "Manchester": "New Hampshire",
+        "Portland": "Maine",
+        "Concord": "New Hampshire",
+        "Burlington": "Vermont",
+        "Utica": "New York",
+        "Syracuse": "New York",
+        "Rochester": "New York",
+        "Erie": "Pennsylvania"
+    }
 
-while isUsed:
-    connection.ping(reconnect=True)
-    sign_user_choice()
+    city_prompt = input("\nPlease input your closest major city: ").capitalize()
+    state_prompt = ((input("\nPlease input the state it is located in: ")).lower()).capitalize()
+    state_list = []
+    for key, value in cities_dict.items():
+        if value == state_prompt:
+            if key == city_prompt:
+                correct_city = []
+                random_address = f"{number} {random_names} {random_types}, {key}, {value}"
+                print("\nNearest ATM: ", random_address)
+                correct_city.append(key)
+            else:
+                state_list.append(key)
     
+    
+        
 
+    if len(state_list) > 0 and city_prompt != key:
+        city = random.choice(state_list)
+        print(f"\nThere is an ATM located in {city}.")
+    
+    elif state_prompt != value and city_prompt != key:
+        print("\nWe do not operate in your state of interest.")
+
+
+
+if __name__ == '__main__':
+    #connect()
+    #while isUsed:
+    #   sign_user_choice()  
+    nearest_ATM()
