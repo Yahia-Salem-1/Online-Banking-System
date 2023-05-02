@@ -316,7 +316,7 @@ def nearest_ATM():
 
 
 if __name__ == '__main__':
-    #connect()
-    #while isUsed:
-    #   sign_user_choice()  
-    nearest_ATM()
+    connect()
+    while isUsed:
+       sign_user_choice()  
+
